@@ -8,7 +8,6 @@ import { TaskCategory } from '@/types';
 export const StudyTargetCards: React.FC = () => {
   const { startTimer, timeSessions, currentSimulatedDate } = useApp();
 
-  // Compute minutes logged today for each category
   const todaysSessions = timeSessions.filter((s) => s.date === currentSimulatedDate);
 
   const getMinutesForCategory = (cat: TaskCategory) => {
@@ -23,58 +22,45 @@ export const StudyTargetCards: React.FC = () => {
       title: 'DSA Preparation',
       targetMinutes: 120,
       icon: Brain,
-      color: 'from-cyan-500/20 to-cyan-950/40',
-      borderColor: 'border-cyan-500/30',
-      iconColor: 'text-cyan-400',
-      description: '2h Daily Target (Jan 2027 Placement Goal)',
+      description: '2h Daily Target (Jan 2027 Goal)',
     },
     {
       category: 'Data Science' as TaskCategory,
       title: 'Data Science Course',
       targetMinutes: 90,
       icon: BarChart3,
-      color: 'from-blue-500/20 to-blue-950/40',
-      borderColor: 'border-blue-500/30',
-      iconColor: 'text-blue-400',
-      description: '1.5h CodeWithHarry & ML Algorithms',
+      description: '1.5h CodeWithHarry & ML Lab',
     },
     {
       category: 'Web Development' as TaskCategory,
       title: 'Web Development',
       targetMinutes: 60,
       icon: Code2,
-      color: 'from-emerald-500/20 to-emerald-950/40',
-      borderColor: 'border-emerald-500/30',
-      iconColor: 'text-emerald-400',
-      description: '1h Full-Stack & Next.js Strengthening',
+      description: '1h Full-Stack Strengthening',
     },
     {
       category: 'Major Project' as TaskCategory,
       title: 'Semester Project',
       targetMinutes: 90,
       icon: Rocket,
-      color: 'from-purple-500/20 to-purple-950/40',
-      borderColor: 'border-purple-500/30',
-      iconColor: 'text-purple-400',
-      description: '2-Month Sprint Deadline (Nov 27)',
+      description: '2-Month Sprint (Due Nov 27)',
     },
     {
       category: 'Placement' as TaskCategory,
       title: 'Placement & Exam Sprint',
       targetMinutes: 90,
       icon: Briefcase,
-      color: 'from-amber-500/20 to-amber-950/40',
-      borderColor: 'border-amber-500/30',
-      iconColor: 'text-amber-400',
-      description: 'Targeted Aptitude & PW / L&T Revision',
+      description: 'PW & L&T Targeted Revision',
     },
   ];
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-slate-200">Today&apos;s Core Study Targets</h3>
-        <span className="text-xs text-slate-400">Pillar Goals</span>
+        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          Today&apos;s Core Study Targets
+        </h3>
+        <span className="text-xs text-zinc-500 dark:text-zinc-400">Pillar Goals</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
@@ -86,40 +72,46 @@ export const StudyTargetCards: React.FC = () => {
           return (
             <div
               key={idx}
-              className={`p-3.5 rounded-2xl bg-gradient-to-b ${tgt.color} border ${tgt.borderColor} flex flex-col justify-between space-y-3 shadow-md`}
+              className="p-4 rounded-3xl bg-white dark:bg-[#121214] border border-zinc-200 dark:border-zinc-800/80 shadow-sm flex flex-col justify-between space-y-3 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all"
             >
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="p-1.5 rounded-lg bg-slate-900/70 border border-slate-800">
-                    <Icon className={`w-4 h-4 ${tgt.iconColor}`} />
+                <div className="flex items-center justify-between mb-2">
+                  <div className="p-2 rounded-2xl bg-zinc-100 dark:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300">
+                    <Icon className="w-4 h-4" />
                   </div>
                   <button
                     onClick={() => startTimer(Math.max(25, tgt.targetMinutes - loggedMinutes), tgt.category, `${tgt.title} Focus Block`)}
-                    className="p-1.5 rounded-lg bg-slate-900/80 hover:bg-cyan-900/60 text-slate-300 hover:text-cyan-300 border border-slate-700/60 text-[10px] font-bold flex items-center gap-1 transition-all"
+                    className="px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-[11px] font-medium flex items-center gap-1 transition-all"
                     title="Start Session Timer"
                   >
-                    <Play className="w-3 h-3 fill-current" />
+                    <Play className="w-2.5 h-2.5 fill-current" />
                     <span>Focus</span>
                   </button>
                 </div>
 
-                <h4 className="font-bold text-white text-xs">{tgt.title}</h4>
-                <p className="text-[10px] text-slate-300 mt-0.5 leading-snug">{tgt.description}</p>
+                <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 text-xs">
+                  {tgt.title}
+                </h4>
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-snug">
+                  {tgt.description}
+                </p>
               </div>
 
               <div>
-                <div className="flex items-center justify-between text-[11px] mb-1 font-mono">
-                  <span className="text-slate-400">
+                <div className="flex items-center justify-between text-[11px] mb-1 font-mono text-zinc-600 dark:text-zinc-400">
+                  <span>
                     {loggedMinutes}m / {tgt.targetMinutes}m
                   </span>
-                  <span className={percent >= 100 ? 'text-emerald-400 font-bold' : 'text-cyan-400'}>
+                  <span className="font-medium text-zinc-900 dark:text-zinc-100">
                     {percent}%
                   </span>
                 </div>
-                <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div className="w-full h-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
-                      percent >= 100 ? 'bg-emerald-400' : 'bg-gradient-to-r from-cyan-500 to-indigo-500'
+                      percent >= 100
+                        ? 'bg-emerald-500'
+                        : 'bg-zinc-900 dark:bg-zinc-100'
                     }`}
                     style={{ width: `${percent}%` }}
                   />

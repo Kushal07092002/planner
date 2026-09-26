@@ -15,17 +15,15 @@ export const CountdownsRow: React.FC = () => {
       date: '2026-10-03',
       category: 'Placement / Teaching Staff',
       icon: ShieldAlert,
-      color: 'border-amber-500/40 bg-amber-950/20 text-amber-400',
-      badge: 'Critical Phase 1',
+      badge: 'Phase 1 Target',
       href: '/placements',
     },
     {
       title: 'Course Exam 1 & 2',
       date: '2026-10-05',
-      category: 'MTech Academic Exams',
+      category: 'Academic Semester',
       icon: Award,
-      color: 'border-rose-500/40 bg-rose-950/20 text-rose-400',
-      badge: 'Semester Exams',
+      badge: 'Exams Active',
       href: '/missions',
     },
     {
@@ -33,26 +31,23 @@ export const CountdownsRow: React.FC = () => {
       date: '2026-10-12',
       category: 'Placement Exam',
       icon: Timer,
-      color: 'border-cyan-500/40 bg-cyan-950/20 text-cyan-400',
       badge: 'High Impact',
       href: '/placements',
     },
     {
       title: 'Major Project Defense',
       date: '2026-11-27',
-      category: '2-Month Semester Project',
+      category: 'Semester Project',
       icon: Rocket,
-      color: 'border-purple-500/40 bg-purple-950/20 text-purple-400',
       badge: 'Hard Deadline',
       href: '/project',
     },
     {
-      title: 'DSA Jan 2027 Mastery',
+      title: 'DSA Jan 2027 Target',
       date: '2027-01-31',
-      category: 'Placement Readiness Goal',
+      category: 'Placement Readiness',
       icon: Brain,
-      color: 'border-emerald-500/40 bg-emerald-950/20 text-emerald-400',
-      badge: 'Long-Term Pillar',
+      badge: 'Long-Term Goal',
       href: '/dsa',
     },
   ];
@@ -60,13 +55,13 @@ export const CountdownsRow: React.FC = () => {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-          <Timer className="w-4 h-4 text-cyan-400" />
+        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+          <Timer className="w-4 h-4 text-zinc-900 dark:text-zinc-100" />
           <span>Active Countdown Timelines</span>
         </h3>
         <Link
           href="/calendar"
-          className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1"
+          className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium flex items-center gap-1"
         >
           View Calendar <ArrowRight className="w-3 h-3" />
         </Link>
@@ -82,37 +77,39 @@ export const CountdownsRow: React.FC = () => {
             <Link
               key={idx}
               href={item.href}
-              className={`p-3.5 rounded-2xl border ${item.color} backdrop-blur-md hover:scale-[1.02] transition-all flex flex-col justify-between group shadow-md`}
+              className="p-4 rounded-3xl bg-white dark:bg-[#121214] border border-zinc-200 dark:border-zinc-800/80 shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-slate-900/80">
+                  <span className="text-[10px] uppercase font-semibold text-zinc-500 dark:text-zinc-400">
                     {item.badge}
                   </span>
-                  <Icon className="w-4 h-4" />
+                  <div className="p-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                    <Icon className="w-3.5 h-3.5" />
+                  </div>
                 </div>
-                <h4 className="font-bold text-white text-sm group-hover:text-cyan-300 transition-colors">
+                <h4 className="font-semibold text-zinc-900 dark:text-white text-xs">
                   {item.title}
                 </h4>
-                <p className="text-[11px] text-slate-400 truncate mt-0.5">{item.category}</p>
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">{item.category}</p>
               </div>
 
-              <div className="mt-3 pt-2.5 border-t border-slate-800 flex items-end justify-between">
+              <div className="mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800/60 flex items-end justify-between">
                 <div>
-                  <span className="text-[10px] text-slate-400 block">{formatDate(item.date)}</span>
+                  <span className="text-[10px] text-zinc-400 block">{formatDate(item.date)}</span>
                   <div className="flex items-baseline gap-1">
                     <span
-                      className={`text-xl font-black ${
-                        isUrgent ? 'text-amber-400 animate-pulse' : 'text-white'
+                      className={`text-lg font-bold ${
+                        isUrgent ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-900 dark:text-white'
                       }`}
                     >
                       {daysLeft >= 0 ? daysLeft : 0}
                     </span>
-                    <span className="text-[11px] text-slate-400 font-medium">days left</span>
+                    <span className="text-[11px] text-zinc-500 font-medium">days left</span>
                   </div>
                 </div>
 
-                <div className="p-1 rounded-lg bg-slate-800 text-slate-400 group-hover:text-white group-hover:bg-cyan-600 transition-colors">
+                <div className="p-1 text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
                   <ArrowRight className="w-3.5 h-3.5" />
                 </div>
               </div>

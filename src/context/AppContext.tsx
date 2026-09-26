@@ -18,6 +18,7 @@ import {
   LTQuestionLog,
   PriorityLevel,
   TaskCategory,
+  ScheduleBlock,
 } from '../types';
 import {
   INITIAL_EXAMS,
@@ -33,6 +34,7 @@ import {
   INITIAL_TASKS,
   INITIAL_LT_QUESTION_LOGS,
   INITIAL_TIME_SESSIONS,
+  INITIAL_SCHEDULE_BLOCKS,
 } from '../lib/seedData';
 import { getCurrentPhaseInfo, CurrentPhaseInfo } from '../lib/priorityEngine';
 
@@ -46,12 +48,24 @@ interface ActiveTimer {
 }
 
 interface AppContextType {
+  // Theme
+  theme: 'dark' | 'light';
+  setTheme: (theme: 'dark' | 'light') => void;
+  toggleTheme: () => void;
+
   // Date and Phase
   currentSimulatedDate: string;
   setCurrentSimulatedDate: (date: string) => void;
   phaseInfo: CurrentPhaseInfo;
   isSimulatedMode: boolean;
   setIsSimulatedMode: (val: boolean) => void;
+
+  // Schedule Blocks (Editable on Today page)
+  scheduleBlocks: ScheduleBlock[];
+  addScheduleBlock: (block: Omit<ScheduleBlock, 'id'>) => void;
+  updateScheduleBlock: (id: string, updates: Partial<ScheduleBlock>) => void;
+  deleteScheduleBlock: (id: string) => void;
+  resetScheduleBlocks: () => void;
 
   // Tasks
   tasks: Task[];
@@ -143,11 +157,13 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'placement_command_center_v1';
+const STORAGE_KEY = 'placement_command_center_v2';
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [theme, setThemeState] = useState<'dark' | 'light'>('dark');
   const [currentSimulatedDate, setCurrentSimulatedDate] = useState<string>('2026-09-27');
   const [isSimulatedMode, setIsSimulatedMode] = useState<boolean>(true);
+  const [scheduleBlocks, setScheduleBlocks] = useState<ScheduleBlock[]>(INITIAL_SCHEDULE_BLOCKS);
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [exams, setExams] = useState<Exam[]>(INITIAL_EXAMS);
   const [companies, setCompanies] = useState<Company[]>(INITIAL_COMPANIES);
@@ -174,12 +190,30 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     presetMinutes: 25,
   });
 
+  const setTheme = (newTheme: 'dark' | 'light') => {
+    setThemeState(newTheme);
+    if (typeof document !== 'undefined') {
+      if (newTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  };
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+  };
+
   // Load from local storage on mount
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
+        if (parsed.theme) setTheme(parsed.theme);
+        if (parsed.scheduleBlocks) setScheduleBlocks(parsed.scheduleBlocks);
         if (parsed.tasks) setTasks(parsed.tasks);
         if (parsed.exams) setExams(parsed.exams);
         if (parsed.companies) setCompanies(parsed.companies);
@@ -195,6 +229,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         if (parsed.dailyReviews) setDailyReviews(parsed.dailyReviews);
         if (parsed.timeSessions) setTimeSessions(parsed.timeSessions);
         if (parsed.currentSimulatedDate) setCurrentSimulatedDate(parsed.currentSimulatedDate);
+      } else {
+        // Apply default dark class
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.add('dark');
+        }
       }
     } catch (e) {
       console.warn('Failed to load from localStorage:', e);
@@ -205,6 +244,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     try {
       const payload = {
+        theme,
+        scheduleBlocks,
         tasks,
         exams,
         companies,
@@ -226,6 +267,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       console.warn('Failed to save to localStorage:', e);
     }
   }, [
+    theme,
+    scheduleBlocks,
     tasks,
     exams,
     companies,
@@ -250,9 +293,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       interval = setInterval(() => {
         setActiveTimer((prev) => {
           if (prev.secondsRemaining <= 1) {
-            // Finished
-            showNotification(`🎯 Focus Session Finished: ${prev.taskTitle}`);
-            playBeepSound();
+            showNotification(`Focus Session Finished: ${prev.taskTitle}`);
             return {
               ...prev,
               isRunning: false,
@@ -278,25 +319,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }, 4000);
   };
 
-  const playBeepSound = () => {
-    try {
-      if (typeof window !== 'undefined' && (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)) {
-        const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-        const ctx = new AudioCtx();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, ctx.currentTime); // A5
-        gain.gain.setValueAtTime(0.1, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.6);
-      }
-    } catch (e) {
-      // Audio not supported or blocked
-    }
+  // Schedule Block Handlers
+  const addScheduleBlock = (block: Omit<ScheduleBlock, 'id'>) => {
+    const newBlock: ScheduleBlock = { ...block, id: 'sb-' + Date.now() };
+    setScheduleBlocks((prev) => [...prev, newBlock]);
+    showNotification('Schedule block added');
+  };
+
+  const updateScheduleBlock = (id: string, updates: Partial<ScheduleBlock>) => {
+    setScheduleBlocks((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, ...updates } : b))
+    );
+    showNotification('Schedule block updated');
+  };
+
+  const deleteScheduleBlock = (id: string) => {
+    setScheduleBlocks((prev) => prev.filter((b) => b.id !== id));
+    showNotification('Schedule block removed');
+  };
+
+  const resetScheduleBlocks = () => {
+    setScheduleBlocks(INITIAL_SCHEDULE_BLOCKS);
+    showNotification('Schedule restored to default');
   };
 
   // Timer Handlers
@@ -309,7 +353,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       taskTitle: taskTitle || 'Focus Session',
       presetMinutes,
     });
-    showNotification(`⏱️ Started ${presetMinutes}m timer for ${category}`);
+    showNotification(`Started ${presetMinutes}m timer for ${category}`);
   };
 
   const pauseTimer = () => {
@@ -346,7 +390,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       id: 'ts-' + Date.now(),
     };
     setTimeSessions((prev) => [newSession, ...prev]);
-    showNotification(`Saved ${session.durationMinutes}m study session to logs!`);
+    showNotification(`Saved ${session.durationMinutes}m study session`);
   };
 
   // Task Handlers
@@ -356,7 +400,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       id: 'task-' + Date.now(),
     };
     setTasks((prev) => [newTask, ...prev]);
-    showNotification(`Task "${task.title}" added`);
+    showNotification(`Task "${task.title}" created`);
   };
 
   const updateTask = (id: string, updates: Partial<Task>) => {
@@ -373,13 +417,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       prev.map((t) => {
         if (t.id === id) {
           const isDone = t.status === 'completed';
-          const newStatus = isDone ? 'todo' : 'completed';
-          if (!isDone) {
-            playBeepSound();
-          }
           return {
             ...t,
-            status: newStatus,
+            status: isDone ? 'todo' : 'completed',
             completedAt: !isDone ? new Date().toISOString() : undefined,
           };
         }
@@ -390,7 +430,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const rescheduleTask = (id: string, newDate: string) => {
     updateTask(id, { dueDate: newDate });
-    showNotification(`Task rescheduled to ${newDate}`);
+    showNotification(`Task moved to ${newDate}`);
   };
 
   const setTop3Priority = (taskId: string, isTop3: boolean) => {
@@ -445,7 +485,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const addDSAProblem = (problem: Omit<DSAProblem, 'id'>) => {
     const newProb: DSAProblem = { ...problem, id: 'dsa-' + Date.now() };
     setDsaProblems((prev) => [newProb, ...prev]);
-    showNotification(`DSA Problem "${problem.title}" added`);
+    showNotification(`DSA problem "${problem.title}" added`);
   };
 
   const updateDSAProblem = (id: string, updates: Partial<DSAProblem>) => {
@@ -461,7 +501,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       prev.map((p) => {
         if (p.id === id) {
           const solved = !p.solved;
-          if (solved) playBeepSound();
           return {
             ...p,
             solved,
@@ -494,7 +533,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const addProjectTask = (task: Omit<ProjectTask, 'id'>) => {
     const newTask: ProjectTask = { ...task, id: 'pt-' + Date.now() };
     setProjectTasks((prev) => [...prev, newTask]);
-    showNotification(`Project task added`);
+    showNotification('Project task added');
   };
 
   const updateProjectTask = (id: string, updates: Partial<ProjectTask>) => {
@@ -513,7 +552,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const addClientProject = (project: Omit<ClientProject, 'id'>) => {
     const newProj: ClientProject = { ...project, id: 'cp-' + Date.now() };
     setClientProjects((prev) => [...prev, newProj]);
-    showNotification(`Client project "${project.projectName}" added`);
+    showNotification(`Project "${project.projectName}" added`);
   };
 
   const updateClientProject = (id: string, updates: Partial<ClientProject>) => {
@@ -533,7 +572,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           const newVal = !currentVal;
           const newCompletions = { ...h.completions, [dateStr]: newVal };
           const newStreak = newVal ? h.streak + 1 : Math.max(0, h.streak - 1);
-          if (newVal) playBeepSound();
           return {
             ...h,
             completions: newCompletions,
@@ -569,7 +607,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       createdAt: new Date().toISOString(),
     };
     setDailyReviews((prev) => [newReview, ...prev]);
-    showNotification('Daily evening review logged successfully!');
+    showNotification('Daily evening review saved');
   };
 
   const rolloverUnfinishedTasks = (targetTomorrowDate: string = '2026-09-28') => {
@@ -587,12 +625,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         return t;
       })
     );
-    showNotification(`Rolled over ${rolledCount} unfinished tasks to ${targetTomorrowDate}`);
+    showNotification(`Rolled over ${rolledCount} tasks to ${targetTomorrowDate}`);
     return rolledCount;
   };
 
   // Reset & Export
   const resetAllToSeedData = () => {
+    setScheduleBlocks(INITIAL_SCHEDULE_BLOCKS);
     setTasks(INITIAL_TASKS);
     setExams(INITIAL_EXAMS);
     setCompanies(INITIAL_COMPANIES);
@@ -608,12 +647,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setDailyReviews([]);
     setTimeSessions(INITIAL_TIME_SESSIONS);
     setCurrentSimulatedDate('2026-09-27');
-    showNotification('All application state reset to seed defaults!');
+    showNotification('All data reset to default seed state');
   };
 
   const exportDataJSON = () => {
     return JSON.stringify(
       {
+        theme,
+        scheduleBlocks,
         tasks,
         exams,
         companies,
@@ -638,6 +679,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const importDataJSON = (jsonStr: string): boolean => {
     try {
       const parsed = JSON.parse(jsonStr);
+      if (parsed.theme) setTheme(parsed.theme);
+      if (parsed.scheduleBlocks) setScheduleBlocks(parsed.scheduleBlocks);
       if (parsed.tasks) setTasks(parsed.tasks);
       if (parsed.exams) setExams(parsed.exams);
       if (parsed.companies) setCompanies(parsed.companies);
@@ -653,10 +696,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (parsed.dailyReviews) setDailyReviews(parsed.dailyReviews);
       if (parsed.timeSessions) setTimeSessions(parsed.timeSessions);
       if (parsed.currentSimulatedDate) setCurrentSimulatedDate(parsed.currentSimulatedDate);
-      showNotification('Custom backup data imported successfully!');
+      showNotification('Backup data imported successfully');
       return true;
     } catch (e) {
-      showNotification('Failed to parse JSON file!');
+      showNotification('Failed to parse JSON file');
       return false;
     }
   };
@@ -666,11 +709,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   return (
     <AppContext.Provider
       value={{
+        theme,
+        setTheme,
+        toggleTheme,
         currentSimulatedDate,
         setCurrentSimulatedDate,
         phaseInfo,
         isSimulatedMode,
         setIsSimulatedMode,
+        scheduleBlocks,
+        addScheduleBlock,
+        updateScheduleBlock,
+        deleteScheduleBlock,
+        resetScheduleBlocks,
         tasks,
         addTask,
         updateTask,

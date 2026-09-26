@@ -7,10 +7,9 @@ import { useApp } from '@/context/AppContext';
 export const FixedCommitmentsBar: React.FC = () => {
   const { currentSimulatedDate } = useApp();
 
-  // Determine day of week from simulated date
   const [year, month, day] = currentSimulatedDate.split('-').map(Number);
   const d = new Date(year, month - 1, day);
-  const dayIndex = d.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+  const dayIndex = d.getDay();
 
   const isMon = dayIndex === 1;
   const isTue = dayIndex === 2;
@@ -25,83 +24,65 @@ export const FixedCommitmentsBar: React.FC = () => {
   const hasCricket = isSat || isSun;
 
   return (
-    <div className="p-4 rounded-2xl bg-slate-900/70 border border-slate-800 backdrop-blur-md">
+    <div className="p-4 rounded-3xl bg-white dark:bg-[#121214] border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-            Fixed Schedule Protections for {d.toLocaleDateString('en-US', { weekday: 'long' })}
+          <ShieldCheck className="w-4 h-4 text-zinc-900 dark:text-zinc-100" />
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-800 dark:text-zinc-200">
+            Fixed Commitments ({d.toLocaleDateString('en-US', { weekday: 'long' })})
           </h3>
         </div>
-        <span className="text-[11px] text-slate-400 flex items-center gap-1">
-          <Moon className="w-3.5 h-3.5 text-indigo-400" /> 8h Sleep Protected (11:30 PM - 7:30 AM)
+        <span className="text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1 font-medium">
+          <Moon className="w-3.5 h-3.5 text-zinc-400" /> 8h Sleep Protected (11:30 PM - 7:30 AM)
         </span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
         {/* Classes */}
-        <div
-          className={`p-2.5 rounded-xl border flex items-center justify-between ${
-            hasClasses
-              ? 'bg-amber-950/20 border-amber-500/30 text-amber-300'
-              : 'bg-slate-950/40 border-slate-800 text-slate-500'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-4 h-4" />
+        <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <BookOpen className="w-4 h-4 text-zinc-500" />
             <div>
-              <span className="text-xs font-bold block">Department Classes</span>
-              <span className="text-[10px] text-slate-400">
-                {hasClasses ? '2 Hours Protected Block' : 'No Classes Today'}
+              <span className="text-xs font-semibold text-zinc-900 dark:text-white block">Department Classes</span>
+              <span className="text-[10px] text-zinc-500">
+                {hasClasses ? '2h Lecture Block' : 'No Classes Today'}
               </span>
             </div>
           </div>
-          <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${hasClasses ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-800 text-slate-500'}`}>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium">
             {hasClasses ? 'Mon/Tue/Wed/Fri' : 'Off'}
           </span>
         </div>
 
         {/* Gym */}
-        <div
-          className={`p-2.5 rounded-xl border flex items-center justify-between ${
-            hasGym
-              ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
-              : 'bg-slate-950/40 border-slate-800 text-slate-500'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <Dumbbell className="w-4 h-4" />
+        <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Dumbbell className="w-4 h-4 text-zinc-500" />
             <div>
-              <span className="text-xs font-bold block">Gym & Strength</span>
-              <span className="text-[10px] text-slate-400">
-                {hasGym ? '2 Hours Workout Block' : 'Rest Day'}
+              <span className="text-xs font-semibold text-zinc-900 dark:text-white block">Gym & Strength</span>
+              <span className="text-[10px] text-zinc-500">
+                {hasGym ? '2h Workout Session' : 'Rest Day'}
               </span>
             </div>
           </div>
-          <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${hasGym ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-500'}`}>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium">
             {hasGym ? 'Mon/Tue/Thu/Fri' : 'Rest'}
           </span>
         </div>
 
         {/* Cricket */}
-        <div
-          className={`p-2.5 rounded-xl border flex items-center justify-between ${
-            hasCricket
-              ? 'bg-cyan-950/20 border-cyan-500/30 text-cyan-300'
-              : 'bg-slate-950/40 border-slate-800 text-slate-500'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4" />
+        <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Activity className="w-4 h-4 text-zinc-500" />
             <div>
-              <span className="text-xs font-bold block">Cricket Practice</span>
-              <span className="text-[10px] text-slate-400">
+              <span className="text-xs font-semibold text-zinc-900 dark:text-white block">Cricket Practice</span>
+              <span className="text-[10px] text-zinc-500">
                 {hasCricket ? 'Weekend Ground Practice' : 'Weekday Rest'}
               </span>
             </div>
           </div>
-          <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${hasCricket ? 'bg-cyan-500/20 text-cyan-300' : 'bg-slate-800 text-slate-500'}`}>
-            {hasCricket ? 'Sat/Sun Active' : 'Off'}
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium">
+            {hasCricket ? 'Active' : 'Off'}
           </span>
         </div>
       </div>

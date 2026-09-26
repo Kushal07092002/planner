@@ -12,6 +12,7 @@ import {
   Task,
   LTQuestionLog,
   TimeSession,
+  ScheduleBlock,
 } from '../types';
 
 export const INITIAL_EXAMS: Exam[] = [
@@ -694,3 +695,16 @@ export const INITIAL_TIME_SESSIONS: TimeSession[] = [
   { id: 'ts-4', category: 'Data Science', taskTitle: 'CodeWithHarry Decision Trees Implementation', durationMinutes: 75, startTime: '19:30', endTime: '20:45', date: '2026-09-26' },
   { id: 'ts-5', category: 'Placement', taskTitle: 'Physics Wallah Pedagogy Preparation', durationMinutes: 45, startTime: '08:00', endTime: '08:45', date: '2026-09-27', notes: 'Morning focus session' },
 ];
+
+export const INITIAL_SCHEDULE_BLOCKS: ScheduleBlock[] = [
+  { id: 'sb-1', time: '07:30 - 08:30 AM', title: 'Morning Routine & Placement Fast-Revision', category: 'Placement Prep', type: 'routine' },
+  { id: 'sb-2', time: '09:00 - 11:00 AM', title: 'MTech Department Classes (Fixed)', category: 'Academic', type: 'class', isFixed: true },
+  { id: 'sb-3', time: '11:15 - 01:15 PM', title: 'DSA 2-Hour Deep Focus (LeetCode)', category: 'DSA 2027', type: 'study' },
+  { id: 'sb-4', time: '02:00 - 03:30 PM', title: 'Major Semester Project Implementation Block', category: 'Major Project', type: 'project' },
+  { id: 'sb-5', time: '03:45 - 05:15 PM', title: 'CodeWithHarry Data Science & ML Lab', category: 'Data Science', type: 'study' },
+  { id: 'sb-6', time: '05:30 - 07:30 PM', title: 'Gym Strength & Conditioning Session (Fixed)', category: 'Fitness', type: 'health', isFixed: true },
+  { id: 'sb-7', time: '08:15 - 09:15 PM', title: 'Web Dev & Full-Stack Revision / Client Editing', category: 'Web Dev / Client', type: 'study' },
+  { id: 'sb-8', time: '09:30 - 11:00 PM', title: 'Sprint Exam Targeted Practice (PW / L&T)', category: 'Sprint Priority', type: 'study' },
+  { id: 'sb-9', time: '11:00 - 11:30 PM', title: 'Daily Evening Review & Tomorrow Planning', category: 'Review', type: 'review' },
+];
+

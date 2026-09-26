@@ -21,19 +21,21 @@ import {
   Sparkles,
   BookOpenCheck,
   ChevronRight,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 
 export const NAV_ITEMS = [
-  { name: 'Dashboard', icon: LayoutDashboard, route: '/dashboard', badge: 'Core' },
-  { name: 'Today', icon: CalendarCheck, route: '/today', badge: 'Daily' },
+  { name: 'Dashboard', icon: LayoutDashboard, route: '/dashboard' },
+  { name: 'Today', icon: CalendarCheck, route: '/today' },
   { name: 'Calendar', icon: Calendar, route: '/calendar' },
-  { name: 'Missions', icon: Target, route: '/missions', badge: 'Sprint' },
+  { name: 'Missions', icon: Target, route: '/missions' },
   { name: 'Placements', icon: Briefcase, route: '/placements' },
-  { name: 'DSA', icon: Brain, route: '/dsa', badge: '2027' },
+  { name: 'DSA', icon: Brain, route: '/dsa' },
   { name: 'Data Science', icon: BarChart3, route: '/data-science' },
   { name: 'Web Development', icon: Code2, route: '/web-development' },
-  { name: 'Major Project', icon: Rocket, route: '/project', badge: 'Critical' },
+  { name: 'Major Project', icon: Rocket, route: '/project' },
   { name: 'Client Work', icon: Video, route: '/client-work' },
   { name: 'Habits', icon: Flame, route: '/habits' },
   { name: 'Time Tracker', icon: Timer, route: '/time-tracker' },
@@ -46,71 +48,66 @@ export const Sidebar: React.FC<{ isOpen?: boolean; onClose?: () => void }> = ({
   onClose,
 }) => {
   const pathname = usePathname();
-  const { currentSimulatedDate, phaseInfo, activeTimer } = useApp();
+  const { currentSimulatedDate, phaseInfo, activeTimer, theme, toggleTheme } = useApp();
 
   return (
     <aside
-      className={`fixed top-0 left-0 bottom-0 z-40 w-64 bg-[#0c1220]/95 backdrop-blur-xl border-r border-slate-800/80 flex flex-col transition-transform duration-300 ${
+      className={`fixed top-0 left-0 bottom-0 z-40 w-64 bg-white/95 dark:bg-[#0c0c0e]/95 backdrop-blur-xl border-r border-zinc-200 dark:border-zinc-800/80 flex flex-col transition-all duration-300 ${
         isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}
     >
       {/* Brand Header */}
-      <div className="p-4 border-b border-slate-800/60 flex items-center justify-between">
+      <div className="p-4 border-b border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
         <Link
           href="/dashboard"
           onClick={onClose}
           className="flex items-center gap-3 group text-left"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-emerald-400 p-[1px] shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
-            <div className="w-full h-full bg-[#090d16] rounded-[11px] flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-cyan-400" />
-            </div>
+          <div className="w-9 h-9 rounded-2xl bg-zinc-900 dark:bg-white flex items-center justify-center shadow-sm">
+            <Sparkles className="w-4 h-4 text-white dark:text-zinc-900" />
           </div>
           <div>
-            <span className="font-bold text-base tracking-wide bg-gradient-to-r from-cyan-300 via-indigo-200 to-white bg-clip-text text-transparent block">
+            <span className="font-semibold text-sm tracking-tight text-zinc-900 dark:text-white block">
               Placement OS
             </span>
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium tracking-wide">
               Command Center
             </span>
           </div>
         </Link>
       </div>
 
-      {/* Active Sprint Indicator Widget */}
-      <div className="mx-3 my-3 p-2.5 rounded-xl bg-gradient-to-br from-amber-500/10 via-slate-900/60 to-slate-900/80 border border-amber-500/30 text-xs">
-        <div className="flex items-center justify-between text-amber-400 font-medium mb-1">
-          <span className="flex items-center gap-1.5 text-[11px]">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-            Active Sprint
+      {/* Active Sprint Minimal Status Card */}
+      <div className="mx-3 my-3 p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 text-xs">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+            October Sprint
           </span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">
+          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono">
             {phaseInfo.daysRemainingInPhase}d left
           </span>
         </div>
-        <p className="text-[11px] text-slate-300 font-medium truncate">
+        <p className="text-[11px] text-zinc-600 dark:text-zinc-400 font-medium truncate">
           {phaseInfo.nextCriticalMilestone}
-        </p>
-        <p className="text-[10px] text-slate-400 truncate mt-0.5">
-          Sprint Date: {currentSimulatedDate}
         </p>
       </div>
 
-      {/* Active Timer Indicator if running */}
+      {/* Active Timer Pill if running */}
       {activeTimer.isRunning && (
         <Link
           href="/time-tracker"
           onClick={onClose}
-          className="mx-3 mb-2 p-2 rounded-lg bg-cyan-950/40 border border-cyan-500/40 flex items-center justify-between hover:bg-cyan-900/30 transition-colors"
+          className="mx-3 mb-2 p-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/40 flex items-center justify-between hover:opacity-90 transition-opacity"
         >
           <div className="flex items-center gap-2">
-            <Timer className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
-            <span className="text-[11px] text-cyan-300 font-mono">
+            <Timer className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 animate-spin" />
+            <span className="text-[11px] text-blue-700 dark:text-blue-300 font-mono font-medium">
               {Math.floor(activeTimer.secondsRemaining / 60)}:
               {(activeTimer.secondsRemaining % 60).toString().padStart(2, '0')}
             </span>
           </div>
-          <span className="text-[10px] text-cyan-400 font-semibold truncate max-w-[80px]">
+          <span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium truncate max-w-[80px]">
             {activeTimer.category}
           </span>
         </Link>
@@ -126,52 +123,37 @@ export const Sidebar: React.FC<{ isOpen?: boolean; onClose?: () => void }> = ({
               key={item.route}
               href={item.route}
               onClick={onClose}
-              className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all group ${
+              className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                 isActive
-                  ? 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/10 text-cyan-300 border border-cyan-500/30 font-semibold'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                  ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900/50'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <Icon
                   className={`w-4 h-4 transition-colors ${
-                    isActive ? 'text-cyan-400' : 'text-slate-400 group-hover:text-slate-200'
+                    isActive ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
                   }`}
                 />
                 <span>{item.name}</span>
               </div>
-              {item.badge && (
-                <span
-                  className={`text-[9px] px-1.5 py-0.5 rounded uppercase font-bold tracking-wider ${
-                    isActive
-                      ? 'bg-cyan-500/30 text-cyan-200'
-                      : item.badge === 'Critical'
-                      ? 'bg-rose-500/20 text-rose-300'
-                      : item.badge === 'Sprint'
-                      ? 'bg-amber-500/20 text-amber-300'
-                      : 'bg-slate-800 text-slate-400'
-                  }`}
-                >
-                  {item.badge}
-                </span>
-              )}
             </Link>
           );
         })}
       </div>
 
-      {/* Bottom Evening Review Quick CTA */}
-      <div className="p-3 border-t border-slate-800/60 bg-[#080d17]">
+      {/* Bottom Evening Review CTA & Theme Switcher */}
+      <div className="p-3 border-t border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30 space-y-2">
         <Link
           href="/daily-review"
           onClick={onClose}
-          className="flex items-center justify-between w-full p-2 rounded-lg bg-gradient-to-r from-indigo-950/60 to-purple-950/60 border border-indigo-500/30 text-indigo-300 hover:text-white hover:border-indigo-400 transition-all text-xs font-medium group"
+          className="flex items-center justify-between w-full p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700/60 text-zinc-800 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-all text-xs font-medium group"
         >
           <div className="flex items-center gap-2">
-            <BookOpenCheck className="w-3.5 h-3.5 text-indigo-400" />
+            <BookOpenCheck className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
             <span>Daily Evening Review</span>
           </div>
-          <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform text-zinc-400" />
         </Link>
       </div>
     </aside>

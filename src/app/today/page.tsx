@@ -21,7 +21,7 @@ import { DailyScheduleTimeline } from '@/components/today/DailyScheduleTimeline'
 import { StudyTargetCards } from '@/components/today/StudyTargetCards';
 import { DailyScoreCard } from '@/components/today/DailyScoreCard';
 import { TaskModal } from '@/components/today/TaskModal';
-import { Task, TaskCategory, PriorityLevel } from '@/types';
+import { Task, PriorityLevel } from '@/types';
 import { formatDate } from '@/lib/utils';
 
 export default function TodayPage() {
@@ -32,7 +32,6 @@ export default function TodayPage() {
     rescheduleTask,
     setTop3Priority,
     currentSimulatedDate,
-    setCurrentSimulatedDate,
     startTimer,
     rolloverUnfinishedTasks,
   } = useApp();
@@ -85,13 +84,13 @@ export default function TodayPage() {
   const getPriorityBadge = (p: PriorityLevel) => {
     switch (p) {
       case 'critical':
-        return <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">CRITICAL</span>;
+        return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400">Critical</span>;
       case 'high':
-        return <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">HIGH</span>;
+        return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400">High</span>;
       case 'medium':
-        return <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">MEDIUM</span>;
+        return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400">Medium</span>;
       default:
-        return <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400">LOW</span>;
+        return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">Low</span>;
     }
   };
 
@@ -101,53 +100,53 @@ export default function TodayPage() {
     return (
       <div
         key={task.id}
-        className={`group p-4 rounded-2xl border transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+        className={`group p-3.5 sm:p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
           isDone
-            ? 'bg-slate-900/40 border-slate-800/80 opacity-60'
-            : task.isPriorityTop3
-            ? 'bg-gradient-to-r from-slate-900 via-indigo-950/20 to-slate-900 border-indigo-500/40 shadow-lg'
-            : 'bg-slate-900/80 border-slate-700/60 hover:border-cyan-500/40'
+            ? 'bg-zinc-50/50 dark:bg-zinc-900/20 border-zinc-200/60 dark:border-zinc-800/40 opacity-60'
+            : 'bg-white dark:bg-[#121214] border-zinc-200 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-sm'
         }`}
       >
         <div className="flex items-start gap-3 flex-1">
           <button
             onClick={() => toggleTaskComplete(task.id)}
-            className="mt-0.5 text-slate-400 hover:text-emerald-400 transition-colors"
+            className="mt-0.5 text-zinc-400 hover:text-emerald-500 transition-colors"
           >
             {isDone ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 fill-emerald-500/20" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-500 fill-emerald-500/10" />
             ) : (
-              <Circle className="w-5 h-5 text-slate-500 group-hover:text-cyan-400" />
+              <Circle className="w-5 h-5 text-zinc-300 dark:text-zinc-600 hover:text-zinc-600 dark:hover:text-zinc-300" />
             )}
           </button>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">
-              <span className={`text-sm font-semibold ${isDone ? 'line-through text-slate-400' : 'text-white'}`}>
+              <span className={`text-xs sm:text-sm font-medium ${isDone ? 'line-through text-zinc-400' : 'text-zinc-900 dark:text-zinc-100'}`}>
                 {task.title}
               </span>
               {task.isPriorityTop3 && (
-                <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                  <Flame className="w-3 h-3 fill-amber-300" /> Top Priority
+                <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 font-semibold">
+                  <Flame className="w-3 h-3 fill-current" /> Top 3
                 </span>
               )}
             </div>
 
             {task.description && (
-              <p className="text-xs text-slate-400 mb-1.5 line-clamp-2">{task.description}</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1.5 line-clamp-2">
+                {task.description}
+              </p>
             )}
 
-            <div className="flex items-center gap-2 text-xs text-slate-400 flex-wrap">
-              <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-medium text-[11px]">
+            <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 flex-wrap">
+              <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/70 text-zinc-700 dark:text-zinc-300 font-medium text-[11px]">
                 {task.category}
               </span>
               {getPriorityBadge(task.priority)}
-              <span className="flex items-center gap-1 font-mono text-[11px]">
-                <Clock className="w-3.5 h-3.5 text-cyan-400" />
-                {task.estimatedMinutes} mins
+              <span className="flex items-center gap-1 font-mono text-[11px] text-zinc-500">
+                <Clock className="w-3 h-3" />
+                {task.estimatedMinutes}m
               </span>
               {task.notes && (
-                <span className="text-slate-400 italic text-[11px] truncate max-w-[240px]">
+                <span className="text-zinc-400 italic text-[11px] truncate max-w-[200px]">
                   &bull; {task.notes}
                 </span>
               )}
@@ -155,34 +154,34 @@ export default function TodayPage() {
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-1.5 self-end sm:self-center border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-800">
+        {/* Actions */}
+        <div className="flex items-center gap-1.5 self-end sm:self-center border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-100 dark:border-zinc-800">
           {!isDone && (
             <button
               onClick={() => startTimer(task.estimatedMinutes || 25, task.category, task.title)}
-              className="p-2 rounded-xl bg-cyan-950/60 text-cyan-300 hover:bg-cyan-900/60 border border-cyan-500/40 text-xs font-semibold flex items-center gap-1 transition-all"
+              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-medium flex items-center gap-1 transition-colors"
               title="Start Focus Timer"
             >
-              <Play className="w-3.5 h-3.5 fill-current" />
-              <span className="hidden md:inline">Focus</span>
+              <Play className="w-3 h-3 fill-current" />
+              <span className="hidden sm:inline">Focus</span>
             </button>
           )}
 
           <button
             onClick={() => setTop3Priority(task.id, !task.isPriorityTop3)}
-            className={`p-2 rounded-xl border transition-colors ${
+            className={`p-1.5 rounded-xl border transition-colors ${
               task.isPriorityTop3
-                ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
-                : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-amber-300'
+                ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-600 dark:text-amber-400'
+                : 'bg-transparent border-transparent text-zinc-400 hover:text-amber-500'
             }`}
             title="Toggle Top 3 Priority"
           >
-            <Star className={`w-3.5 h-3.5 ${task.isPriorityTop3 ? 'fill-amber-300' : ''}`} />
+            <Star className={`w-3.5 h-3.5 ${task.isPriorityTop3 ? 'fill-current' : ''}`} />
           </button>
 
           <button
             onClick={() => handleEdit(task)}
-            className="p-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
             title="Edit Task"
           >
             <Edit2 className="w-3.5 h-3.5" />
@@ -190,7 +189,7 @@ export default function TodayPage() {
 
           <button
             onClick={() => setRescheduleTaskId(rescheduleTaskId === task.id ? null : task.id)}
-            className="p-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-cyan-300 transition-colors"
+            className="p-1.5 rounded-xl text-zinc-400 hover:text-blue-500"
             title="Reschedule Task"
           >
             <Calendar className="w-3.5 h-3.5" />
@@ -198,26 +197,26 @@ export default function TodayPage() {
 
           <button
             onClick={() => deleteTask(task.id)}
-            className="p-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-rose-400 transition-colors"
+            className="p-1.5 rounded-xl text-zinc-400 hover:text-red-500"
             title="Delete Task"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Reschedule inline input dropdown */}
+        {/* Reschedule inline date picker */}
         {rescheduleTaskId === task.id && (
-          <div className="w-full mt-2 pt-2 border-t border-slate-800 flex items-center gap-2">
-            <span className="text-xs text-slate-400">Move to:</span>
+          <div className="w-full mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center gap-2">
+            <span className="text-xs text-zinc-500">Move to:</span>
             <input
               type="date"
               defaultValue={currentSimulatedDate}
               onChange={(e) => setNewDateInput(e.target.value)}
-              className="px-2 py-1 rounded bg-slate-950 border border-slate-700 text-xs text-white"
+              className="px-2.5 py-1 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-white"
             />
             <button
               onClick={() => handleRescheduleSubmit(task.id)}
-              className="px-3 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold"
+              className="px-3 py-1 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-xs font-semibold"
             >
               Confirm
             </button>
@@ -228,32 +227,34 @@ export default function TodayPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
-      {/* Top Banner & Date Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl bg-slate-900/60 border border-slate-800 backdrop-blur-xl">
+    <div className="space-y-6 animate-fade">
+      {/* Top Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl bg-white dark:bg-[#121214] border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <CalendarCheck className="w-6 h-6 text-cyan-400" />
-            <h1 className="text-xl sm:text-2xl font-black text-white">Daily War Room</h1>
+            <CalendarCheck className="w-5 h-5 text-zinc-900 dark:text-zinc-100" />
+            <h1 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white">
+              Daily War Room
+            </h1>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Active Planning Date: <span className="text-cyan-300 font-bold">{formatDate(currentSimulatedDate)}</span> &bull; Asia/Kolkata
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+            Planning Date: <span className="font-semibold text-zinc-800 dark:text-zinc-200">{formatDate(currentSimulatedDate)}</span> &bull; Asia/Kolkata
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={() => rolloverUnfinishedTasks()}
-            className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all"
+            className="px-3.5 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700/60 text-xs font-medium flex items-center gap-1.5 transition-all"
             title="Move uncompleted tasks to tomorrow"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
+            <RotateCcw className="w-3.5 h-3.5 text-zinc-500" />
             <span>Rollover Incomplete</span>
           </button>
 
           <button
             onClick={handleCreate}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/20 flex items-center gap-1.5 transition-all hover:scale-105"
+            className="px-4 py-2 rounded-xl bg-zinc-900 dark:bg-white hover:opacity-90 text-white dark:text-zinc-900 text-xs font-semibold shadow-sm flex items-center gap-1.5 transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>Add Task</span>
@@ -261,7 +262,7 @@ export default function TodayPage() {
         </div>
       </div>
 
-      {/* 1. Daily Score and Productivity Metrics */}
+      {/* 1. Daily Score & Schedule Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-1">
           <DailyScoreCard />
@@ -275,26 +276,28 @@ export default function TodayPage() {
       <StudyTargetCards />
 
       {/* 3. Task Checklist & Filters */}
-      <div className="p-5 rounded-3xl bg-slate-900/60 border border-slate-800 backdrop-blur-xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+      <div className="p-5 rounded-3xl bg-white dark:bg-[#121214] border border-zinc-200 dark:border-zinc-800/80 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
           <div>
-            <h2 className="text-base font-bold text-white">Task Checklist & Execution Queue</h2>
-            <p className="text-xs text-slate-400">
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              Task Checklist & Execution Queue
+            </h2>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
               {todaysTasks.filter((t) => t.status === 'completed').length} of {todaysTasks.length} tasks completed today
             </p>
           </div>
 
           {/* Category Filter Pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
-            <Filter className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+            <Filter className="w-3.5 h-3.5 text-zinc-400 flex-shrink-0" />
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all capitalize ${
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-medium whitespace-nowrap transition-all capitalize ${
                   selectedCategory === cat
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                    : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+                    ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold shadow-sm'
+                    : 'bg-zinc-100 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                 }`}
               >
                 {cat}
@@ -305,29 +308,29 @@ export default function TodayPage() {
 
         {/* Top 3 High Priority Tasks */}
         {top3Tasks.length > 0 && (
-          <div className="space-y-2.5">
-            <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
-              Top 3 Priorities for Today
+          <div className="space-y-2">
+            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Flame className="w-3.5 h-3.5 text-amber-500 fill-current" />
+              Top 3 Priorities
             </span>
-            <div className="space-y-2.5">
-              {top3Tasks.map((t) => renderTaskCard(t))}
+            <div className="space-y-2">
+              {top3Tasks.map((task) => renderTaskCard(task))}
             </div>
           </div>
         )}
 
         {/* Remaining Tasks */}
-        <div className="space-y-2.5 pt-2">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-            Scheduled Daily Tasks ({remainingTasks.length})
+        <div className="space-y-2 pt-1">
+          <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
+            Scheduled Tasks ({remainingTasks.length})
           </span>
           {remainingTasks.length === 0 && top3Tasks.length === 0 ? (
-            <div className="p-8 text-center text-slate-400 text-xs rounded-2xl bg-slate-950/40 border border-slate-800">
-              No tasks found in this category. Click &quot;Add Task&quot; above to log an action!
+            <div className="p-8 text-center text-zinc-400 text-xs rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800">
+              No tasks found in this category. Click &quot;Add Task&quot; above to create one.
             </div>
           ) : (
-            <div className="space-y-2.5">
-              {remainingTasks.map((t) => renderTaskCard(t))}
+            <div className="space-y-2">
+              {remainingTasks.map((task) => renderTaskCard(task))}
             </div>
           )}
         </div>

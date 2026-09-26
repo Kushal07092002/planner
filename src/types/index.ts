@@ -28,6 +28,15 @@ export interface Task {
   isPriorityTop3?: boolean;
 }
 
+export interface ScheduleBlock {
+  id: string;
+  time: string; // e.g. "07:30 - 08:30 AM"
+  title: string;
+  category: string;
+  type?: 'routine' | 'class' | 'study' | 'project' | 'health' | 'review' | 'custom';
+  isFixed?: boolean;
+}
+
 export interface Exam {
   id: string;
   name: string;
@@ -53,11 +62,6 @@ export interface Company {
   location?: string;
   notes?: string;
   result?: string;
-}
-
-export interface LTQuestionCategory {
-  name: string;
-  topics: string[];
 }
 
 export interface LTQuestionLog {
@@ -155,7 +159,7 @@ export interface ClientProject {
   deadline: string;
   status: ClientWorkStatus;
   hoursSpent: number;
-  payment: number; // in INR
+  payment: number;
   currency: string;
   revisionCount: number;
   notes?: string;
@@ -167,7 +171,7 @@ export interface Habit {
   targetDescription: string;
   iconName: string;
   daysSchedule: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday' | 'daily')[];
-  completions: Record<string, boolean>; // date string "YYYY-MM-DD" -> true/false
+  completions: Record<string, boolean>;
   streak: number;
   bestStreak: number;
 }
@@ -187,23 +191,23 @@ export interface CalendarEvent {
   id: string;
   title: string;
   category: 'placement' | 'academic' | 'learning' | 'project' | 'health' | 'client';
-  date: string; // YYYY-MM-DD
-  startTime?: string; // HH:mm
-  endTime?: string; // HH:mm
+  date: string;
+  startTime?: string;
+  endTime?: string;
   description?: string;
   isAllDay?: boolean;
 }
 
 export interface DailyReview {
   id: string;
-  date: string; // YYYY-MM-DD
+  date: string;
   completedSummary: string;
   failedSummary: string;
   reasonForMiss: string;
   moveToTomorrow: string;
   tomorrowPriority: string;
-  energyLevel: number; // 1-10
-  productivityLevel: number; // 1-10
+  energyLevel: number;
+  productivityLevel: number;
   createdAt: string;
 }
 
