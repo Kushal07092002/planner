@@ -1,0 +1,480 @@
+// Prisma Schema for Placement Command Center
+// PostgreSQL Database configuration for Supabase
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  studentStatus String    @default("Final-year MTech Data Science student")
+  timezone      String    @default("Asia/Kolkata")
+  sleepTargetHours Float  @default(8.0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  tasks                 Task[]
+  dailyPlans            DailyPlan[]
+  dailyReviews          DailyReview[]
+  calendarEvents        CalendarEvent[]
+  missions              Mission[]
+  companies             Company[]
+  placementApplications PlacementApplication[]
+  exams                 Exam[]
+  dsaTopics             DSATopic[]
+  dsaProblems           DSAProblem[]
+  dsaSessions           DSASession[]
+  dataScienceTopics     DataScienceTopic[]
+  dataScienceSessions   DataScienceSession[]
+  webDevTopics          WebDevelopmentTopic[]
+  webDevSessions        WebDevelopmentSession[]
+  projects              Project[]
+  clients               Client[]
+  habits                Habit[]
+  studySessions         StudySession[]
+  notifications         Notification[]
+
+  @@map("users")
+}
+
+model Task {
+  id               String       @id @default(uuid())
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title            String
+  description      String?
+  category         String       // Placement, DSA, Data Science, Web Development, Major Project, Client Work, Academic, Health & Fitness
+  priority         String       // critical, high, medium, low
+  status           String       @default("todo") // todo, in_progress, completed, cancelled
+  dueDate          DateTime     @db.Date
+  estimatedMinutes Int          @default(45)
+  actualMinutes    Int?         @default(0)
+  isPriorityTop3   Boolean      @default(false)
+  notes            String?
+  completedAt      DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([userId, dueDate])
+  @@index([status])
+  @@index([priority])
+  @@map("tasks")
+}
+
+model DailyPlan {
+  id               String       @id @default(uuid())
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date             DateTime     @db.Date
+  phaseName        String
+  top1Priority     String?
+  top2Priority     String?
+  top3Priority     String?
+  productivityScore Int         @default(0)
+  energyScore      Int?         @default(8)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@unique([userId, date])
+  @@map("daily_plans")
+}
+
+model DailyReview {
+  id               String       @id @default(uuid())
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date             DateTime     @db.Date
+  completedSummary String       @db.Text
+  failedSummary    String?      @db.Text
+  reasonForMiss    String?      @db.Text
+  moveToTomorrow   String?      @db.Text
+  tomorrowPriority String       @db.Text
+  energyLevel      Int          @default(8) // 1 to 10
+  productivityLevel Int         @default(8) // 1 to 10
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@unique([userId, date])
+  @@map("daily_reviews")
+}
+
+model CalendarEvent {
+  id          String       @id @default(uuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  category    String       // placement, academic, learning, project, health, client
+  date        DateTime     @db.Date
+  startTime   String?
+  endTime     String?
+  isAllDay    Boolean      @default(false)
+  description String?      @db.Text
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([userId, date])
+  @@map("calendar_events")
+}
+
+model Mission {
+  id          String         @id @default(uuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  type        String         // short_term_sprint, long_term_readiness
+  startDate   DateTime       @db.Date
+  endDate     DateTime       @db.Date
+  description String?        @db.Text
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  phases      MissionPhase[]
+
+  @@map("missions")
+}
+
+model MissionPhase {
+  id          String       @id @default(uuid())
+  missionId   String
+  mission     Mission      @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  name        String
+  order       Int
+  startDate   DateTime?    @db.Date
+  endDate     DateTime?    @db.Date
+  examDate    DateTime?    @db.Date
+  status      String       @default("upcoming") // upcoming, active, completed
+  syllabus    String[]     @default([])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("mission_phases")
+}
+
+model Company {
+  id              String                  @id @default(uuid())
+  userId          String
+  user            User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  role            String
+  status          String                  // Interested, Applied, Preparing, Exam Scheduled, Interview Scheduled, Selected, Rejected, Waiting
+  applicationDate DateTime?               @db.Date
+  examDate        DateTime?               @db.Date
+  interviewDate   DateTime?               @db.Date
+  packageLPA      String?
+  location        String?
+  notes           String?                 @db.Text
+  result          String?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  applications    PlacementApplication[]
+
+  @@map("companies")
+}
+
+model PlacementApplication {
+  id          String       @id @default(uuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyId   String
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  role        String
+  currentStep String
+  status      String
+  notes       String?      @db.Text
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("placement_applications")
+}
+
+model Exam {
+  id                  String       @id @default(uuid())
+  userId              String
+  user                User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                String
+  type                String       // Placement Exam, Academic Exam, Placement / Teaching Staff, Certification
+  date                DateTime     @db.Date
+  priority            String       @default("critical") // critical, high, medium, low
+  companyOrCourse     String?
+  description         String?      @db.Text
+  status              String       @default("upcoming") // upcoming, completed, cancelled
+  syllabus            String[]     @default([])
+  preparednessPercent Int          @default(50)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@index([userId, date])
+  @@map("exams")
+}
+
+model DSATopic {
+  id          String       @id @default(uuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  order       Int
+  totalTarget Int          @default(15)
+  solvedCount Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  problems    DSAProblem[]
+
+  @@map("dsa_topics")
+}
+
+model DSAProblem {
+  id               String       @id @default(uuid())
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topicId          String?
+  topicRelation    DSATopic?    @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  topic            String
+  title            String
+  platform         String       @default("LeetCode")
+  difficulty       String       // Easy, Medium, Hard
+  status           String       @default("In Progress") // Not Started, In Progress, Solved, Revision Required
+  solved           Boolean      @default(false)
+  revisionRequired Boolean      @default(false)
+  timeTakenMinutes Int?         @default(30)
+  attempts         Int          @default(1)
+  notes            String?      @db.Text
+  url              String?
+  lastPracticed    DateTime?    @db.Date
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([userId, topic])
+  @@index([difficulty])
+  @@map("dsa_problems")
+}
+
+model DSASession {
+  id               String       @id @default(uuid())
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date             DateTime     @db.Date
+  durationMinutes  Int          @default(120)
+  problemsSolved   Int          @default(2)
+  notes            String?      @db.Text
+  createdAt        DateTime     @default(now())
+
+  @@map("dsa_sessions")
+}
+
+model DataScienceTopic {
+  id                String       @id @default(uuid())
+  userId            String
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name              String
+  status            String       @default("Learning") // Not Started, Learning, Practicing, Completed, Needs Revision
+  hoursSpent        Float        @default(0)
+  notesCompleted    Boolean      @default(false)
+  projectsCompleted Int          @default(0)
+  keyConcepts       String[]     @default([])
+  notes             String?      @db.Text
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@map("data_science_topics")
+}
+
+model DataScienceSession {
+  id              String       @id @default(uuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date            DateTime     @db.Date
+  durationMinutes Int          @default(90)
+  topicName       String
+  notes           String?      @db.Text
+  createdAt       DateTime     @default(now())
+
+  @@map("data_science_sessions")
+}
+
+model WebDevelopmentTopic {
+  id             String       @id @default(uuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  status         String       @default("Completed")
+  hoursSpent     Float        @default(0)
+  notesCompleted Boolean      @default(true)
+  keyConcepts    String[]     @default([])
+  notes          String?      @db.Text
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("web_development_topics")
+}
+
+model WebDevelopmentSession {
+  id              String       @id @default(uuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date            DateTime     @db.Date
+  durationMinutes Int          @default(60)
+  topicName       String
+  notes           String?      @db.Text
+  createdAt       DateTime     @default(now())
+
+  @@map("web_development_sessions")
+}
+
+model Project {
+  id             String             @id @default(uuid())
+  userId         String
+  user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?            @db.Text
+  deadline       DateTime           @db.Date
+  priority       String             @default("critical")
+  status         String             @default("In Progress")
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  tasks          ProjectTask[]
+  milestones     ProjectMilestone[]
+
+  @@map("projects")
+}
+
+model ProjectTask {
+  id             String       @id @default(uuid())
+  projectId      String?
+  project        Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?      @db.Text
+  priority       String       @default("high")
+  deadline       DateTime?    @db.Date
+  estimatedHours Float        @default(4)
+  actualHours    Float        @default(0)
+  status         String       @default("To Do") // Backlog, To Do, In Progress, Testing, Documentation, Completed
+  notes          String?      @db.Text
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("project_tasks")
+}
+
+model ProjectMilestone {
+  id          String       @id @default(uuid())
+  projectId   String?
+  project     Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  order       Int
+  status      String       @default("Pending") // Pending, In Progress, Completed
+  targetDate  DateTime     @db.Date
+  description String?      @db.Text
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("project_milestones")
+}
+
+model Client {
+  id        String          @id @default(uuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  email     String?
+  phone     String?
+  notes     String?         @db.Text
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  projects  ClientProject[]
+
+  @@map("clients")
+}
+
+model ClientProject {
+  id            String       @id @default(uuid())
+  userId        String?
+  clientId      String?
+  client        Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  clientName    String
+  projectName   String
+  videoType     String       // Reel/Short, YouTube Long-form, Commercial Ad, Documentary, Course Edit
+  deadline      DateTime     @db.Date
+  status        String       @default("Editing") // Backlog, Editing, Review, Revision, Delivered
+  hoursSpent    Float        @default(0)
+  payment       Float        @default(10000)
+  currency      String       @default("INR")
+  revisionCount Int          @default(0)
+  notes         String?      @db.Text
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@map("client_projects")
+}
+
+model Habit {
+  id                String            @id @default(uuid())
+  userId            String
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name              String
+  targetDescription String
+  iconName          String
+  daysSchedule      String[]          @default([]) // monday, tuesday, wednesday, thursday, friday, saturday, sunday, daily
+  streak            Int               @default(0)
+  bestStreak        Int               @default(0)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  completions       HabitCompletion[]
+
+  @@map("habits")
+}
+
+model HabitCompletion {
+  id        String       @id @default(uuid())
+  habitId   String
+  habit     Habit        @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  date      DateTime     @db.Date
+  completed Boolean      @default(true)
+  createdAt DateTime     @default(now())
+
+  @@unique([habitId, date])
+  @@map("habit_completions")
+}
+
+model StudySession {
+  id              String       @id @default(uuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category        String       // Placement, DSA, Data Science, Web Development, Major Project, Client Work
+  taskTitle       String
+  durationMinutes Int
+  startTime       String
+  endTime         String
+  date            DateTime     @db.Date
+  notes           String?      @db.Text
+  createdAt       DateTime     @default(now())
+
+  @@index([userId, date])
+  @@map("study_sessions")
+}
+
+model Notification {
+  id        String       @id @default(uuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String       @db.Text
+  type      String       // exam_reminder, deadline_alert, streak_warning, milestone
+  read      Boolean      @default(false)
+  createdAt DateTime     @default(now())
+
+  @@index([userId, read])
+  @@map("notifications")
+}
